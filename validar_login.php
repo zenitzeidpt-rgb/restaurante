@@ -7,8 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
+// Recibimos los datos del formulario
 $usuario = $_POST['usuario'];
-$password = $_POST['password'];
+$password = $_POST['contraseña']; // <--- CORREGIDO: Ahora coincide con el formulario
 
 $sql = "SELECT id_usuario, usuario, contraseña, rol, nombre 
         FROM usuarios 
@@ -20,23 +21,20 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($user = $result->fetch_assoc()) {
+    // Comparamos la contraseña de la DB con la del formulario
     if ($password === $user['contraseña']) {
 
-        // 1. Guardamos sesión
         $_SESSION['id_usuario'] = $user['id_usuario'];
         $_SESSION['usuario']    = $user['usuario'];
         $_SESSION['rol']        = $user['rol'];
-        $_SESSION['nombre']     = $user['nombre']; // Asegúrate de guardar el nombre para el saludo
+        $_SESSION['nombre']     = $user['nombre'];
 
-        // 2. SI ES CAJERO, ABRIMOS LA CAJA AUTOMÁTICAMENTE
         if ($user['rol'] === 'caja') {
             $id_user = $user['id_usuario'];
             
-            // Verificamos si ya tiene una caja abierta para no duplicar
             $verificar = $conexion->query("SELECT id_arqueo FROM arqueos WHERE id_usuario = '$id_user' AND estado = 'abierto'");
             
             if ($verificar->num_rows == 0) {
-                // Si no hay ninguna abierta, la creamos con 0 de monto inicial
                 $conexion->query("INSERT INTO arqueos (id_usuario, fecha_apertura, monto_inicial, estado) 
                                  VALUES ('$id_user', NOW(), 0, 'abierto')");
             }
@@ -49,5 +47,6 @@ if ($user = $result->fetch_assoc()) {
     }
 }
 
+// Si llegó aquí es porque falló: Redirige con error
 header("Location: index.php?error=1");
 exit;

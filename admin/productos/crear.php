@@ -8,42 +8,51 @@ require_once "../../config/conexion.php";
 
 if ($_POST) {
     $nombre = $_POST['nombre'];
-    $categoria = $_POST['categoria'];
     $precio = $_POST['precio'];
+    $categoria = $_POST['categoria'];
 
     $imagen = $_FILES['imagen']['name'];
-    move_uploaded_file(
-        $_FILES['imagen']['tmp_name'],
-        "../../public/img/platos/" . $imagen
-    );
+    move_uploaded_file($_FILES['imagen']['tmp_name'],
+        "../../public/img/platos/".$imagen);
 
     $conexion->query("
-        INSERT INTO comidas 
-        (nombre, categoria, precio, imagen, estado, fecha_creacion)
-        VALUES 
-        ('$nombre','$categoria','$precio','$imagen','activo',NOW())
+        INSERT INTO comidas (nombre, categoria, precio, imagen, estado)
+        VALUES ('$nombre','$categoria','$precio','$imagen','activo')
     ");
 
     header("Location: listar.php");
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nuevo Platillo</title>
+<link rel="stylesheet" href="../../public/css/estilo.css">
+</head>
 
-<h2>Nuevo Platillo</h2>
+<body class="form-body">
+
+<div class="form-card">
+<h2>🍽 Nuevo Platillo</h2>
 
 <form method="POST" enctype="multipart/form-data">
-    <input type="text" name="nombre" placeholder="Nombre" required><br>
+<input type="text" name="nombre" placeholder="Nombre del platillo" required>
 
-    <select name="categoria">
-        <option value="sopa">Sopa</option>
-        <option value="segundo">Segundo</option>
-        <option value="bebida">Bebida</option>
-        <option value="postre">Postre</option>
-    </select><br>
+<select name="categoria">
+    <option value="sopa">Sopa</option>
+    <option value="segundo">Segundo</option>
+    <option value="bebida">Bebida</option>
+    <option value="postre">Postre</option>
+</select>
 
-    <input type="number" step="0.01" name="precio" placeholder="Precio" required><br>
-    <input type="file" name="imagen" required><br>
+<input type="number" step="0.01" name="precio" placeholder="Precio Bs" required>
+<input type="file" name="imagen" required>
 
-    <button type="submit">Guardar</button>
+<button class="btn btn-nuevo">Guardar</button>
+<a href="listar.php" class="btn btn-volver">Cancelar</a>
 </form>
+</div>
 
-<a href="listar.php">⬅ Volver</a>
+</body>
+</html>
